@@ -21,9 +21,6 @@ import java.util.regex.Pattern;
  */
 public class FakeCfMod implements ClientModInitializer {
 
-    // Your own name
-    private static final String ME = "Momeratic1";
-
     // Colors sampled from your screenshots (shadow is vanilla: color / 4, automatic)
     private static final int YELLOW = 0xFCF744; // GAME SUMMARY
     private static final int GREEN  = 0x36F397; // win
@@ -37,6 +34,16 @@ public class FakeCfMod implements ClientModInitializer {
     private static final String BULLET = "\u2022 ";
 
     private static final Pattern AMT = Pattern.compile("^(\\d+(?:\\.\\d+)?)([kmbtKMBT]?)$");
+
+    private static String getPlayerName(MinecraftClient mc) {
+        if (mc.player != null) {
+            return mc.player.getNameForScoreboard();
+        }
+        if (mc.getSession() != null && mc.getSession().getUsername() != null && !mc.getSession().getUsername().isEmpty()) {
+            return mc.getSession().getUsername();
+        }
+        return "Player";
+    }
 
     @Override
     public void onInitializeClient() {
@@ -74,9 +81,10 @@ public class FakeCfMod implements ClientModInitializer {
         }
         String money = "$" + NumberFormat.getNumberInstance(Locale.US).format(amount);
 
+        String me = getPlayerName(mc);
         int c = won ? GREEN : RED;
-        String winner = won ? ME : opponent;
-        String loser  = won ? opponent : ME;
+        String winner = won ? me : opponent;
+        String loser  = won ? opponent : me;
 
         mc.execute(() -> {
             mc.player.sendMessage(Text.literal(""), false);
